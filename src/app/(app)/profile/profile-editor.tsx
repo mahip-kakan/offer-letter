@@ -7,12 +7,14 @@ import { PageHeader } from "@/components/page-header";
 import { SavedIndicator } from "@/components/saved-indicator";
 import { buttonClassName } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { factTexts, filledBasics, REQUIRED_BASICS, type EntryOrder, type ProfileData } from "@/lib/profile";
+import { filledJobDetails, type JobDetails } from "@/lib/job-details";
+import { experienceMonths, factTexts, filledBasics, REQUIRED_BASICS, type EntryOrder, type ProfileData } from "@/lib/profile";
 
 import { BasicsSection } from "./basics-section";
 import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
 import { FactsSection } from "./facts-section";
+import { JobDetailsSection } from "./job-details-section";
 import { ProjectsSection } from "./projects-section";
 import { PublicationsSection } from "./publications-section";
 import { ReferencesSection } from "./references-section";
@@ -28,8 +30,19 @@ import { SECTIONS, sectionHref, type SectionId } from "./sections";
 /** How experience, projects and education are ordered (E4-9), from Settings. */
 export type ProfileOrder = { experience: EntryOrder; projects: EntryOrder; education: EntryOrder };
 
-export function ProfileEditor({ initial, section, order }: { initial: ProfileData; section: SectionId; order: ProfileOrder }) {
+export function ProfileEditor({
+  initial,
+  initialJobDetails,
+  section,
+  order,
+}: {
+  initial: ProfileData;
+  initialJobDetails: JobDetails;
+  section: SectionId;
+  order: ProfileOrder;
+}) {
   const [profile, setProfile] = useState(initial);
+  const [jobDetails, setJobDetails] = useState(initialJobDetails);
   const saves = useSaveTracker();
 
   const index = SECTIONS.findIndex((entry) => entry.id === section);
@@ -39,6 +52,7 @@ export function ProfileEditor({ initial, section, order }: { initial: ProfileDat
 
   const counts: Record<SectionId, string> = {
     basics: `${filledBasics(profile.basics)}/${REQUIRED_BASICS.length}`,
+    "job-details": `${filledJobDetails(jobDetails)}/4`,
     skills: String(profile.skills.length + profile.languages.length),
     experience: String(profile.experience.length),
     projects: String(profile.projects.length),
@@ -56,6 +70,9 @@ export function ProfileEditor({ initial, section, order }: { initial: ProfileDat
         photo={profile.photo}
         onPhotoChange={(photo) => setProfile((current) => ({ ...current, photo }))}
       />
+    ),
+    "job-details": (
+      <JobDetailsSection details={jobDetails} onChange={setJobDetails} experienceMonths={experienceMonths(profile, new Date())} />
     ),
     skills: <SkillsSection profile={profile} update={setProfile} />,
     experience: <ExperienceSection profile={profile} update={setProfile} order={order.experience} />,

@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { Tone } from "@/generated/prisma/enums";
 import type { Extracted, Match, Unit } from "@/lib/application-data";
 import { emailUnits, isEmailAddress } from "@/lib/application-email";
+import { jobDetailsForPrompt } from "@/lib/job-details";
 import type { ProfileData } from "@/lib/profile";
 import { TONES } from "@/lib/tones";
 
@@ -24,7 +25,11 @@ import {
 } from "./prompt-parts";
 import { withoutFrame } from "./write-cover-letter";
 
-export const WRITE_EMAIL_VERSION = "write-email@2";
+export const WRITE_EMAIL_VERSION = "write-email@3";
+
+/** When the candidate asks for their job details in the email (recruiters in India expect them up front). */
+const JOB_DETAILS_RULE =
+  'The candidate wants their job details in the email, as recruiters in India expect: after the paragraphs about fit, add one paragraph that lists them, one per line, as "Label: value" exactly as given (e.g. "Notice period: 30 days"). Only those given, nothing added.';
 
 const answerSchema = z.object({
   contactName: z.string().nullable(),
@@ -55,6 +60,8 @@ export type EmailInput = {
   posting: string;
   /** The cover letter's paragraphs, so the email doesn't repeat them. */
   letter: string[];
+  /** Job details (CTC, notice period…) to list in the email, from jobDetailLines(); empty leaves them out. */
+  jobDetails?: string[];
 };
 
 /**
@@ -63,10 +70,12 @@ export type EmailInput = {
  * message ends with the sign-off and the candidate's name. An address the
  * posting doesn't contain is never used, so the recipient may be empty.
  */
-export const writeEmail: Task<EmailInput, Unit[]> = async (provider, { profile, extracted, match, tone, facts, posting, letter }, options) => {
+export const writeEmail: Task<EmailInput, Unit[]> = async (provider, { profile, extracted, match, tone, facts, posting, letter, jobDetails = [] }, options) => {
+  const details = jobDetailsForPrompt(jobDetails);
   const answer = await provider.complete({
     system: system(
       INSTRUCTIONS,
+      details && JOB_DETAILS_RULE,
       `Tone: ${TONES[tone].label}. ${TONES[tone].description}`,
       truthfulness(options.strict),
       candidateFacts(profile, facts),
@@ -80,6 +89,7 @@ export const writeEmail: Task<EmailInput, Unit[]> = async (provider, { profile, 
         role: "user",
         content: [
           `The candidate's profile:\n${profileForPrompt(profile)}`,
+          details,
           `The job:\n${jobForPrompt(extracted, match)}`,
           letter.length > 0 && `The cover letter it goes with:\n${letter.join("\n\n")}`,
           applicationFacts(facts),
@@ -108,7 +118,7 @@ export const writeEmail: Task<EmailInput, Unit[]> = async (provider, { profile, 
   const [to, ...written] = emailUnits({ to: recipient(answer.contactName, answer.contactEmail, posting), subject: oneLine(answer.subject), body });
   return {
     // The recipient comes from the posting; the subject and message are checked like the letter's paragraphs.
-    data: [to, ...(options.strict ? guardUnits(written, guardSources(profile, extracted, posting, facts)) : written)],
+    data: [to, ...(options.strict ? guardUnits(written, guardSources(profile, extracted, posting, [...facts, ...jobDetails])) : written)],
     promptVersion: WRITE_EMAIL_VERSION,
   };
 };

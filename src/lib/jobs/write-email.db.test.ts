@@ -16,7 +16,8 @@ vi.mock("@/lib/ai", () => ({ getAiProvider: async () => provider.current }));
 vi.mock("@/lib/ai/task-options", () => ({ loadTaskOptions: async () => ({ creativity: "BALANCED", strict: true, language: null }) }));
 vi.mock("@/lib/profile-data", async () => {
   const { demoProfile } = await import("@/lib/demo-profile");
-  return { loadProfile: async () => demoProfile(), loadFactTexts: async () => [] };
+  const { EMPTY_JOB_DETAILS } = await import("@/lib/job-details");
+  return { loadProfile: async () => demoProfile(), loadFactTexts: async () => [], loadJobDetails: async () => EMPTY_JOB_DETAILS };
 });
 vi.mock("./runner", () => ({ defineJob: <T,>(definition: T) => definition }));
 
@@ -66,7 +67,7 @@ describe("writeEmailJob", () => {
       { id: "subject", text: "Application: Senior Product Designer" },
       { id: "body", text: expect.stringMatching(/^Dear John,\n\nI'm applying/) },
     ]);
-    expect(document.writtenWith).toBe("write-email@2");
+    expect(document.writtenWith).toBe("write-email@3");
     expect(document.versions.map((version) => version.cause)).toEqual(["WRITTEN"]);
     const prompt = JSON.stringify(mock.calls[0]);
     expect(prompt).toMatch(/Dutch/);

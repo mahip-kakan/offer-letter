@@ -1,5 +1,6 @@
 import "server-only";
 
+import { jobDetailsFromFields, type JobDetails } from "@/lib/job-details";
 import { photoFromFields } from "@/lib/photo";
 import { prisma } from "@/lib/prisma";
 import { basicsFromFields, factTexts, inEntryOrder, type FactItem, type ProfileData } from "@/lib/profile";
@@ -82,6 +83,11 @@ export async function loadProfile(): Promise<ProfileData> {
     })),
     facts,
   };
+}
+
+/** The job details recruiters ask for (CTC, notice period, locations), kept apart from the Basics. */
+export async function loadJobDetails(): Promise<JobDetails> {
+  return jobDetailsFromFields(await prisma.profileField.findMany({ where: { key: { startsWith: "job." } } }));
 }
 
 /** One application's facts as the AI gets them (APP-15): trimmed, without empty ones. */

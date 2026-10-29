@@ -7,6 +7,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { JobStatus, LanguageLevel } from "@/generated/prisma/enums";
 import { action, ActionError } from "@/lib/action";
 import { prisma } from "@/lib/prisma";
+import { fieldsFromJobDetails, NOTICE_PERIODS } from "@/lib/job-details";
 import { fieldsFromBasics, inEntryOrder } from "@/lib/profile";
 import { findOrCreateSkill, firstSort, nextSort } from "@/lib/profile-entries";
 import { discardProfileImports, importProfileJob } from "@/lib/jobs/import-profile";
@@ -48,6 +49,30 @@ export const saveBasics = action(
     );
     // The sidebar shows the name.
     if (before !== basics.name) revalidatePath("/", "layout");
+    return null;
+  },
+);
+
+/** Saves the job details recruiters ask for: CTC, notice period, locations; autosaved as you type. */
+export const saveJobDetails = action(
+  z.object({
+    currentCtc: text(200),
+    expectedCtc: text(200),
+    noticePeriod: z.string().refine((value) => NOTICE_PERIODS.some((option) => option.value === value), "Pick a notice period from the list."),
+    lastWorkingDay: z.union([z.literal(""), z.iso.date()]),
+    noticeNegotiable: z.boolean(),
+    preferredLocations: text(300),
+    openToRelocate: z.boolean(),
+    inApplicationEmails: z.boolean(),
+  }),
+  async (details) => {
+    await prisma.$transaction(
+      Object.entries(fieldsFromJobDetails(details)).map(([key, value]) =>
+        value === null
+          ? prisma.profileField.deleteMany({ where: { key } })
+          : prisma.profileField.upsert({ where: { key }, create: { key, value }, update: { value } }),
+      ),
+    );
     return null;
   },
 );

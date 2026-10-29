@@ -2,6 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 
+import { formatInrSalary } from "@/lib/india";
+
 import type { JobSourceAdapter, JSearchHost, RequestContext, SourceCredentials } from "./adapter";
 import { countryName } from "./countries";
 import { jobSearchError } from "./errors";
@@ -74,6 +76,7 @@ function salaryOf(job: Job): string {
   if (written) return written;
   const { job_min_salary: min, job_max_salary: max } = job;
   if (min == null && max == null) return "";
+  if (job.job_salary_currency?.toUpperCase() === "INR") return formatInrSalary(min, max, job.job_salary_period);
   const amount = (value: number) => value.toLocaleString("en-US", { maximumFractionDigits: 0 });
   const range = min != null && max != null && min !== max ? `${amount(min)}–${amount(max)}` : amount((min ?? max)!);
   return [job.job_salary_currency, range, PERIODS[job.job_salary_period?.toUpperCase() ?? ""]].filter(Boolean).join(" ");

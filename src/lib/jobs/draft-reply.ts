@@ -10,7 +10,8 @@ import { extractedOf } from "@/lib/application-data";
 import { proposeSlots, workingHours } from "@/lib/google/availability";
 import { formatSlot } from "@/lib/google/slots";
 import { prisma } from "@/lib/prisma";
-import { loadFactTexts, loadProfile } from "@/lib/profile-data";
+import { jobDetailLines } from "@/lib/job-details";
+import { loadFactTexts, loadJobDetails, loadProfile } from "@/lib/profile-data";
 
 import { defineJob } from "./runner";
 
@@ -57,7 +58,7 @@ export const draftReplyJob = defineJob({
       take: 4,
       select: { direction: true, fromName: true, body: true },
     });
-    const [provider, options, profile] = await Promise.all([getAiProvider(), loadTaskOptions(), loadProfile()]);
+    const [provider, options, profile, details] = await Promise.all([getAiProvider(), loadTaskOptions(), loadProfile(), loadJobDetails()]);
     const { data, promptVersion } = await draftReply(
       provider,
       {
@@ -71,6 +72,7 @@ export const draftReplyJob = defineJob({
         note,
         facts: application ? await loadFactTexts(application.id) : [],
         posting: application?.postingText ?? "",
+        jobDetails: jobDetailLines(details, profile),
       },
       { ...options, language: null, signal },
     );

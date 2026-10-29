@@ -11,6 +11,13 @@ export const SECTIONS = [
     hint: "How employers can reach you. Only what you choose to show ends up on a resume.",
   },
   {
+    id: "job-details",
+    optional: true,
+    label: "Job details",
+    title: "Job details",
+    hint: "What recruiters in India ask first: CTC, notice period and where you'll work. Replies to recruiters answer from these; they never go on a resume or cover letter.",
+  },
+  {
     id: "skills",
     optional: false,
     label: "Skills & languages",

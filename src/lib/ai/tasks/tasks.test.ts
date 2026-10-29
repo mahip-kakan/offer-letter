@@ -358,7 +358,7 @@ describe("writeEmail", () => {
   it("writes the recipient, subject and message, ending with the sign-off and name", async () => {
     const provider = model(answer);
     const { data, promptVersion } = await writeEmail(provider, input, options);
-    expect(promptVersion).toBe("write-email@2");
+    expect(promptVersion).toBe("write-email@3");
     expect(data).toEqual([
       { id: "to", label: "Recipient", text: "John Doe <john.doe@example.com>" },
       { id: "subject", label: "Subject", text: "Application: Senior Product Designer, Jane Doe" },

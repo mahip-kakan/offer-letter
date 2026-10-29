@@ -2,6 +2,7 @@ import "server-only";
 
 import { z } from "zod";
 
+import { formatLpa } from "@/lib/india";
 import { fetchPosting } from "@/lib/posting-fetch";
 
 import type { JobSourceAdapter, RequestContext, SourceCredentials } from "./adapter";
@@ -46,9 +47,10 @@ const responseSchema = z.object({ results: z.array(z.unknown()), count: z.coerce
 function salaryOf(result: Result, country: string): string {
   const { salary_min: min, salary_max: max } = result;
   if (!min && !max) return "";
+  const estimated = result.salary_is_predicted === "1" || result.salary_is_predicted === 1 || result.salary_is_predicted === true;
+  if (country === "in") return [formatLpa(min, max), estimated ? "(estimated)" : ""].filter(Boolean).join(" ");
   const amount = (value: number) => Math.round(value).toLocaleString("en-US");
   const range = min && max && Math.round(min) !== Math.round(max) ? `${amount(min)}–${amount(max)}` : amount((min || max)!);
-  const estimated = result.salary_is_predicted === "1" || result.salary_is_predicted === 1 || result.salary_is_predicted === true;
   return [CURRENCIES[country], range, "a year", estimated ? "(estimated)" : ""].filter(Boolean).join(" ");
 }
 

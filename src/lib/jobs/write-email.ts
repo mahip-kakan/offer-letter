@@ -13,7 +13,8 @@ import { updateDocuments } from "@/lib/document-units";
 import { saveVersion } from "@/lib/document-versions";
 import { isParagraph } from "@/lib/letter-frame";
 import { prisma } from "@/lib/prisma";
-import { loadFactTexts, loadProfile } from "@/lib/profile-data";
+import { jobDetailLines } from "@/lib/job-details";
+import { loadFactTexts, loadJobDetails, loadProfile } from "@/lib/profile-data";
 import { startupAddress } from "@/lib/startups/types";
 
 import { defineJob } from "./runner";
@@ -47,7 +48,13 @@ export const writeEmailJob = defineJob({
     };
     const match = matchSchema.safeParse(application.match);
 
-    const [provider, options, profile, facts] = await Promise.all([getAiProvider(), loadTaskOptions(), loadProfile(), loadFactTexts(applicationId)]);
+    const [provider, options, profile, facts, details] = await Promise.all([
+      getAiProvider(),
+      loadTaskOptions(),
+      loadProfile(),
+      loadFactTexts(applicationId),
+      loadJobDetails(),
+    ]);
     const { data, promptVersion } = await writeEmail(
       provider,
       {
@@ -59,6 +66,7 @@ export const writeEmailJob = defineJob({
         posting: application.postingText,
         // Only the paragraphs: the letter's sender and signature hold contact details (E8-11).
         letter: (unitsOf(DocumentKind.COVER_LETTER) ?? []).filter(isParagraph).map((unit) => unit.text),
+        jobDetails: details.inApplicationEmails ? jobDetailLines(details, profile) : [],
       },
       // In the language of the resume and the letter it goes with.
       { ...options, language: application.language || options.language, signal },
