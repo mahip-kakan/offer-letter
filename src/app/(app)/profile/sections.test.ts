@@ -14,11 +14,12 @@ describe("profile sections", () => {
       "Publications",
       "References",
       "Facts about me",
+      "Naukri",
     ]);
   });
 
   it("mark Job details, Projects, Publications, References and Facts about me as optional (#216)", () => {
-    expect(SECTIONS.filter((section) => section.optional).map((section) => section.id)).toEqual(["job-details", "projects", "publications", "references", "facts"]);
+    expect(SECTIONS.filter((section) => section.optional).map((section) => section.id)).toEqual(["job-details", "projects", "publications", "references", "facts", "naukri"]);
   });
 
   it("read the current section from the URL, falling back to Basics", () => {

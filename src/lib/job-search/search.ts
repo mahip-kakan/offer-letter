@@ -5,6 +5,7 @@ import { daysBetween, formatShortCalendarDate } from "@/lib/dates";
 import type { PostingFit } from "@/lib/fit";
 
 import { countryCodeFor } from "./countries";
+import { searchPlace } from "@/lib/india-cities";
 
 // Job search (E14): what a search asks for and what a posting looks like,
 // whichever source answers. Shared by the server and the Find jobs screen.
@@ -237,7 +238,9 @@ export function latestRole(experience: readonly Role[]): string {
 
 /** The first search on Find jobs (E14-6): that role, in the profile's city and country. */
 export function defaultSearch({ role, city, country }: { role: string; city: string; country: string }): SearchQuery {
-  return { ...EMPTY_QUERY, keywords: role.trim().slice(0, 200), place: city.trim().slice(0, 200), country: countryCodeFor(country) };
+  const code = countryCodeFor(country);
+  const place = (code === "in" ? searchPlace(city) : city).trim().slice(0, 200);
+  return { ...EMPTY_QUERY, keywords: role.trim().slice(0, 200), place, country: code };
 }
 
 /** "Today", "Yesterday", "3 days ago", "2 weeks ago", or the date for older postings; "" without a date. */

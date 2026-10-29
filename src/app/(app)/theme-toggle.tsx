@@ -38,28 +38,42 @@ export function ThemeToggle({ serverScheme }: { serverScheme?: ColorScheme }) {
   // The server only knows a scheme that was chosen; for the system's it
   // guesses light, and the browser corrects it right after hydration.
   const scheme = useSyncExternalStore(subscribe, currentScheme, () => serverScheme ?? "light");
-  const next: ColorScheme = scheme === "dark" ? "light" : "dark";
-  const label = next === "dark" ? "Dark mode" : "Light mode";
-  const Icon = next === "dark" ? Moon : Sun;
 
-  const toggle = () => {
+  const choose = (next: ColorScheme) => {
     document.documentElement.dataset.theme = next;
     rememberPreference(COLOR_SCHEME_COOKIE, next);
     listeners.forEach((listener) => listener());
   };
 
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      title={collapsed ? label : undefined}
-      className={cn(
-        "flex w-full items-center gap-1.5 rounded-control px-3 py-1.5 text-left text-sm font-medium text-muted hover:bg-hover hover:text-ink motion-safe:transition-colors",
-        collapsed && "justify-center px-1.5",
-      )}
+    <div
+      role="group"
+      aria-label="Color scheme"
+      className={cn("grid gap-0.5", collapsed ? "grid-cols-1" : "grid-cols-2")}
     >
-      <Icon size={16} aria-hidden="true" className="shrink-0" />
-      <span className={cn(collapsed && "sr-only")}>{label}</span>
-    </button>
+      {(
+        [
+          ["light", "Light mode", "Light", Sun],
+          ["dark", "Dark mode", "Dark", Moon],
+        ] as const
+      ).map(([value, name, text, Icon]) => (
+        <button
+          key={value}
+          type="button"
+          aria-label={name}
+          aria-pressed={scheme === value}
+          title={collapsed ? name : undefined}
+          onClick={() => choose(value)}
+          className={cn(
+            "flex min-h-8 items-center justify-center gap-1.5 rounded-control px-2 py-1.5 text-sm font-medium text-muted hover:bg-hover hover:text-ink motion-safe:transition-colors",
+            scheme === value && "bg-selected text-ink",
+            collapsed && "px-1.5",
+          )}
+        >
+          <Icon size={16} aria-hidden="true" className="shrink-0" />
+          <span className={cn(collapsed && "sr-only")}>{text}</span>
+        </button>
+      ))}
+    </div>
   );
 }

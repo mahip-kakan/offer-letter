@@ -273,7 +273,7 @@ export function createDossierServer(origin: string): McpServer {
       title: "List applications",
       description: "The user's applications in Dossier, newest activity first, with their status. Optionally only one status.",
       inputSchema: z.object({
-        status: z.enum(ApplicationStatus).optional().describe("DRAFT, SENT, SCREENING, INTERVIEW, OFFER, ACCEPTED, REJECTED or DECLINED"),
+        status: z.enum(ApplicationStatus).optional().describe("DRAFT, SENT, RECRUITER_CALL, ASSESSMENT, ASSIGNMENT, SCREENING, INTERVIEW, HR_ROUND, OFFER, NEGOTIATION, BGV, ACCEPTED, JOINED, REJECTED or DECLINED"),
         include_archived: z.boolean().optional(),
         limit: z.number().int().min(1).max(100).optional(),
       }),

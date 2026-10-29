@@ -15,6 +15,7 @@ import { EducationSection } from "./education-section";
 import { ExperienceSection } from "./experience-section";
 import { FactsSection } from "./facts-section";
 import { JobDetailsSection } from "./job-details-section";
+import { NaukriSection } from "./naukri-section";
 import { ProjectsSection } from "./projects-section";
 import { PublicationsSection } from "./publications-section";
 import { ReferencesSection } from "./references-section";
@@ -33,11 +34,13 @@ export type ProfileOrder = { experience: EntryOrder; projects: EntryOrder; educa
 export function ProfileEditor({
   initial,
   initialJobDetails,
+  naukri,
   section,
   order,
 }: {
   initial: ProfileData;
   initialJobDetails: JobDetails;
+  naukri: { headline: string; summary: string; skills: string; due: boolean; refreshedLabel: string };
   section: SectionId;
   order: ProfileOrder;
 }) {
@@ -60,6 +63,7 @@ export function ProfileEditor({
     publications: String(profile.publications.length),
     references: String(profile.references.length),
     facts: String(factTexts(profile.facts).length),
+    naukri: naukri.due ? "due" : "ok",
   };
 
   const body: Record<SectionId, ReactNode> = {
@@ -81,6 +85,7 @@ export function ProfileEditor({
     publications: <PublicationsSection profile={profile} update={setProfile} />,
     references: <ReferencesSection profile={profile} update={setProfile} />,
     facts: <FactsSection profile={profile} update={setProfile} />,
+    naukri: <NaukriSection {...naukri} />,
   };
 
   return (

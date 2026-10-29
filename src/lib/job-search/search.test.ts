@@ -115,6 +115,7 @@ describe("postings", () => {
       country: "de",
     });
     expect(defaultSearch({ role: "", city: "", country: "" })).toEqual(EMPTY_QUERY);
+    expect(defaultSearch({ role: "PM", city: "Bangalore", country: "India" }).place).toBe("Bengaluru");
   });
 
   it("says how long ago a posting went up", () => {

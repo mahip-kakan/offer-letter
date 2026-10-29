@@ -15,17 +15,43 @@ export type StatusInfo = {
   toast: string;
 };
 
-/** All statuses, in board and menu order. */
+/** All statuses, in board and menu order. The stages after Sent follow an India hiring loop. */
 export const STATUSES: readonly StatusInfo[] = [
   { value: ApplicationStatus.DRAFT, label: "Draft", color: "var(--color-status-draft)", group: "in-progress", toast: "Moved back to draft." },
   { value: ApplicationStatus.SENT, label: "Sent", color: "var(--color-status-sent)", group: "in-progress", toast: "Marked as sent. Fingers crossed!" },
+  { value: ApplicationStatus.RECRUITER_CALL, label: "Recruiter call", color: "var(--color-status-recruiter)", group: "in-progress", toast: "Recruiter call. They want a first chat." },
+  { value: ApplicationStatus.ASSESSMENT, label: "Assessment", color: "var(--color-status-assessment)", group: "in-progress", toast: "An assessment. You've got this." },
+  { value: ApplicationStatus.ASSIGNMENT, label: "Assignment", color: "var(--color-status-assignment)", group: "in-progress", toast: "An assignment. Take it one piece at a time." },
   { value: ApplicationStatus.SCREENING, label: "Screening", color: "var(--color-status-screening)", group: "in-progress", toast: "In screening. They're taking a look." },
   { value: ApplicationStatus.INTERVIEW, label: "Interview", color: "var(--color-status-interview)", group: "in-progress", toast: "An interview! You've got this." },
+  { value: ApplicationStatus.HR_ROUND, label: "HR round", color: "var(--color-status-hr)", group: "in-progress", toast: "HR round. You're close." },
   { value: ApplicationStatus.OFFER, label: "Offer", color: "var(--color-status-offer)", group: "in-progress", toast: "An offer. Congratulations!" },
+  { value: ApplicationStatus.NEGOTIATION, label: "Negotiation", color: "var(--color-status-negotiation)", group: "in-progress", toast: "Negotiating. Ask for what you need." },
+  { value: ApplicationStatus.BGV, label: "Background check", color: "var(--color-status-bgv)", group: "in-progress", toast: "Background check. Nearly there." },
   { value: ApplicationStatus.ACCEPTED, label: "Accepted", color: "var(--color-status-accepted)", group: "closed", toast: "Accepted. Huge congratulations!" },
+  { value: ApplicationStatus.JOINED, label: "Joined", color: "var(--color-status-joined)", group: "closed", toast: "Joined. Congratulations!" },
   { value: ApplicationStatus.REJECTED, label: "Rejected", color: "var(--color-status-rejected)", group: "closed", toast: "Sorry, that's a tough one. On to the next." },
   { value: ApplicationStatus.DECLINED, label: "Declined", color: "var(--color-status-declined)", group: "closed", toast: "Declined. Good on you for choosing well." },
 ];
+
+/**
+ * Which funnel stage a status counts toward. Finer India stages share a
+ * stage, so the funnel stays Sent → Screening → Interview → Offer → Accepted.
+ */
+const FUNNEL_OF: Partial<Record<ApplicationStatus, FunnelStage>> = {
+  [ApplicationStatus.SENT]: FunnelStage.SENT,
+  [ApplicationStatus.RECRUITER_CALL]: FunnelStage.SCREENING,
+  [ApplicationStatus.ASSESSMENT]: FunnelStage.SCREENING,
+  [ApplicationStatus.ASSIGNMENT]: FunnelStage.SCREENING,
+  [ApplicationStatus.SCREENING]: FunnelStage.SCREENING,
+  [ApplicationStatus.INTERVIEW]: FunnelStage.INTERVIEW,
+  [ApplicationStatus.HR_ROUND]: FunnelStage.INTERVIEW,
+  [ApplicationStatus.OFFER]: FunnelStage.OFFER,
+  [ApplicationStatus.NEGOTIATION]: FunnelStage.OFFER,
+  [ApplicationStatus.BGV]: FunnelStage.ACCEPTED,
+  [ApplicationStatus.ACCEPTED]: FunnelStage.ACCEPTED,
+  [ApplicationStatus.JOINED]: FunnelStage.ACCEPTED,
+};
 
 export function statusInfo(status: ApplicationStatus): StatusInfo {
   const info = STATUSES.find((entry) => entry.value === status);
@@ -99,9 +125,8 @@ export function advance(application: StatusFields, to: ApplicationStatus, now: D
     sentAt ??= now;
     furthestStage = higherStage(furthestStage, FunnelStage.SENT);
   }
-  if ((FUNNEL_STAGES as readonly string[]).includes(to)) {
-    furthestStage = higherStage(furthestStage, to as FunnelStage);
-  }
+  const stage = FUNNEL_OF[to];
+  if (stage) furthestStage = higherStage(furthestStage, stage);
 
   return {
     update: { status: to, furthestStage, sentAt },

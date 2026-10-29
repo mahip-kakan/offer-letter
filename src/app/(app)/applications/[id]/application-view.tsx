@@ -65,6 +65,7 @@ import { StatusControl } from "./status-control";
 import { ThemeMenu } from "./theme-menu";
 import { byPageLimit, TrimmedNotice } from "./trimmed-notice";
 
+import { HiringTab, type HiringState } from "./hiring-tab";
 import { aboutWords, type Tab } from "./tabs";
 import { UnitFrame } from "./unit-frame";
 import { VersionHistory, type ViewedVersion } from "./version-history";
@@ -159,6 +160,8 @@ export type ApplicationViewProps = {
   /** A reply still being written, e.g. since before a reload. */
   refining: string | null;
   suggestions: RefineSuggestions;
+  /** Referral and joining date. The page always passes it; tests can leave it out. */
+  hiring?: HiringState;
 };
 
 /**
@@ -195,6 +198,7 @@ export function ApplicationView({
   messages,
   refining,
   suggestions,
+  hiring,
 }: ApplicationViewProps) {
   const router = useRouter();
   const [tab, setTab] = useState(initialTab);
@@ -653,6 +657,7 @@ export function ApplicationView({
           )}
           <TabsTrigger value="posting">{score ? `Job posting · ${score.hit}/${score.total} match` : "Job posting"}</TabsTrigger>
           <TabsTrigger value="notes">{notes > 0 ? `Notes · ${notes}` : "Notes"}</TabsTrigger>
+          <TabsTrigger value="hiring">Hiring</TabsTrigger>
         </TabsList>
       </ApplicationHeader>
 
@@ -738,6 +743,7 @@ export function ApplicationView({
             onWrite={() => void writeEmail()}
             attachments={attachments}
             gmail={gmail && { sender: gmail.sender, sentBefore: gmail.sentBefore }}
+            whatsApp={{ name: profile.basics.name, role: application.title, company: application.company }}
           />
         </TabsContent>
 
@@ -757,6 +763,15 @@ export function ApplicationView({
           />
         </TabsContent>
 
+        <TabsContent value="hiring" className="flex min-h-0 min-w-0 flex-[999_1_480px]">
+          <HiringTab
+            applicationId={application.id}
+            company={application.company}
+            role={application.title}
+            candidate={profile.basics.name}
+            initial={hiring ?? { joiningDate: "", name: "", contact: "", relation: "", status: "NOT_ASKED", message: "", askedAt: null }}
+          />
+        </TabsContent>
         <TabsContent value="notes" className="flex min-h-0 min-w-0 flex-[999_1_480px]">
           <NotesTab applicationId={application.id} activity={activity} />
         </TabsContent>

@@ -27,6 +27,7 @@ export function Dashboard({
   quietDays = DEFAULT_QUIET_DAYS,
   empty,
   calendar,
+  notices,
 }: {
   figures: DashboardFigures;
   firstName: string;
@@ -39,6 +40,8 @@ export function Dashboard({
   empty: boolean;
   /** The calendar (E15-6), which the time filter doesn't scope. */
   calendar?: ReactNode;
+  /** India reminders: Naukri, referrals, joining dates. */
+  notices?: ReactNode;
 }) {
   const { sent, heardBack } = figures;
   // The summary follows the time filter, so it says which period it covers.
@@ -60,6 +63,8 @@ export function Dashboard({
           </Link>
         }
       />
+
+      {notices}
 
       {empty ? (
         <Columns calendar={calendar}>

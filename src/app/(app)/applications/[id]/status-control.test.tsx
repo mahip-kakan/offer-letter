@@ -40,7 +40,7 @@ describe("the application header (E8-1)", () => {
 });
 
 describe("the status control (E8-1)", () => {
-  it("lists all eight statuses with the current one ticked", async () => {
+  it("lists every status with the current one ticked", async () => {
     const user = userEvent.setup();
     render(<StatusControl id="app-1" status="INTERVIEW" />);
     await user.click(screen.getByRole("button", { name: "Status: Interview" }));
@@ -51,10 +51,17 @@ describe("the status control (E8-1)", () => {
     expect(items.map((item) => item.textContent)).toEqual([
       "Draft",
       "Sent",
+      "Recruiter call",
+      "Assessment",
+      "Assignment",
       "Screening",
       "Interview✓",
+      "HR round",
       "Offer",
+      "Negotiation",
+      "Background check",
       "Accepted",
+      "Joined",
       "Rejected",
       "Declined",
     ]);
@@ -70,11 +77,11 @@ describe("the status control (E8-1)", () => {
     const pill = screen.getByRole("button", { name: "Status: Sent" });
     pill.focus();
     await user.keyboard("{Enter}");
-    // Sent is ticked, so focus starts on Draft: two steps down is Screening.
+    // The menu opens on Draft. Two steps down is Recruiter call.
     await user.keyboard("{ArrowDown}{ArrowDown}{Enter}");
 
-    expect(changeStatus).toHaveBeenCalledWith("app-1", "SCREENING");
-    expect(screen.getByRole("button", { name: "Status: Screening" })).toHaveFocus();
+    expect(changeStatus).toHaveBeenCalledWith("app-1", "RECRUITER_CALL");
+    expect(screen.getByRole("button", { name: "Status: Recruiter call" })).toHaveFocus();
     finish();
   });
 

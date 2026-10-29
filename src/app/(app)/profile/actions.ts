@@ -64,6 +64,9 @@ export const saveJobDetails = action(
     preferredLocations: text(300),
     openToRelocate: z.boolean(),
     inApplicationEmails: z.boolean(),
+    buyoutAmount: text(200),
+    relievingLetter: z.boolean(),
+    experienceLetter: z.boolean(),
   }),
   async (details) => {
     await prisma.$transaction(
@@ -76,6 +79,18 @@ export const saveJobDetails = action(
     return null;
   },
 );
+
+/** Marks the Naukri profile refreshed today, which clears the weekly reminder. */
+export const markNaukriRefreshed = action(z.object({}), async () => {
+  const value = new Date().toISOString().slice(0, 10);
+  await prisma.profileField.upsert({
+    where: { key: "naukri.refreshedAt" },
+    create: { key: "naukri.refreshedAt", value },
+    update: { value },
+  });
+  revalidatePath("/");
+  return value;
+});
 
 // ─── Photo (#224) ────────────────────────────────────────────────────────────
 

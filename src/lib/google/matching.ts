@@ -96,12 +96,19 @@ export function matchMail(
 const RANK: Record<ApplicationStatus, number> = {
   DRAFT: 0,
   SENT: 1,
-  SCREENING: 2,
-  INTERVIEW: 3,
-  OFFER: 4,
-  ACCEPTED: 5,
-  REJECTED: 5,
-  DECLINED: 5,
+  RECRUITER_CALL: 2,
+  ASSESSMENT: 3,
+  ASSIGNMENT: 4,
+  SCREENING: 5,
+  INTERVIEW: 6,
+  HR_ROUND: 7,
+  OFFER: 8,
+  NEGOTIATION: 9,
+  BGV: 10,
+  ACCEPTED: 11,
+  JOINED: 12,
+  REJECTED: 12,
+  DECLINED: 12,
 };
 
 /**

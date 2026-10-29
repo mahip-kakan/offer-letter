@@ -29,6 +29,7 @@ export const loadApplication = cache(async (id: string) => {
       notes: true,
       events: { select: { id: true, to: true, at: true } },
       facts: { select: { id: true, text: true }, orderBy: [{ sort: "asc" }, { createdAt: "asc" }] },
+      referral: true,
     },
   });
   if (!application) notFound();

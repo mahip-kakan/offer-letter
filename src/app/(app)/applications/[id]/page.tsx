@@ -138,6 +138,15 @@ export default async function ApplicationPage({ params, searchParams }: PageProp
       rewriting={rewriting}
       messages={messages}
       refining={refineJobs.at(-1)?.id ?? null}
+      hiring={{
+        joiningDate: application.joiningDate ? application.joiningDate.toISOString().slice(0, 10) : "",
+        name: application.referral?.name ?? "",
+        contact: application.referral?.contact ?? "",
+        relation: application.referral?.relation ?? "",
+        status: application.referral?.status ?? "NOT_ASKED",
+        message: application.referral?.message ?? "",
+        askedAt: application.referral?.askedAt?.toISOString() ?? null,
+      }}
       suggestions={refineSuggestions({
         match,
         requirements: extracted?.requirements ?? [],

@@ -350,12 +350,29 @@ model Setting {
 enum ApplicationStatus {
   DRAFT
   SENT
+  /// A recruiter screen, before a hiring-manager interview.
+  RECRUITER_CALL
+  ASSESSMENT
+  ASSIGNMENT
   SCREENING
   INTERVIEW
+  HR_ROUND
   OFFER
+  NEGOTIATION
+  /// Background verification, after an accepted offer.
+  BGV
   ACCEPTED
+  JOINED
   REJECTED
   DECLINED
+}
+
+/// Where a referral request stands. One referral per application.
+enum ReferralStatus {
+  NOT_ASKED
+  ASKED
+  REFERRED
+  NO_REPLY
 }
 
 /// How an application was made: by the user, or by the job agent (E16).
@@ -436,6 +453,10 @@ model Application {
   /// in, when Dossier added it: kept in step with nextInterviewAt both ways.
   interviewEventId    String?
   interviewCalendarId String?
+  /// The day the candidate is due to join, once there's an offer.
+  joiningDate         DateTime?         @db.Date
+  /// The person asked to refer this application, if anyone.
+  referral            Referral?
   /// The Find jobs posting it was started from, if any (E14-8).
   posting             Posting?
   /// The agent candidate it was prepared from (E16).
@@ -461,6 +482,46 @@ model Application {
 
 /// One status change. Keeps the application's furthestStage and sentAt from
 /// before the change, so the change can be undone (decision in #26).
+/// One person asked to refer one application.
+model Referral {
+  id            String         @id @default(cuid())
+  applicationId String         @unique
+  application   Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  name          String         @default("")
+  contact       String         @default("")
+  /// How the candidate knows them: "Manager at Acme", "college senior".
+  relation      String         @default("")
+  status        ReferralStatus @default(NOT_ASKED)
+  /// When the ask went out; the dashboard nudges five days later.
+  askedAt       DateTime?
+  /// The message, edited from the drafted one.
+  message       String         @default("")
+  updatedAt     DateTime       @updatedAt
+}
+
+/// An offer to compare. Amounts are rupees; 0 means nothing was entered.
+model Offer {
+  id                      String   @id @default(cuid())
+  company                 String   @default("")
+  role                    String   @default("")
+  basicMonthly            Int      @default(0)
+  /// Monthly cash gross, before employee PF, professional tax and income tax.
+  fixedGrossMonthly       Int      @default(0)
+  variableAnnual          Int      @default(0)
+  joiningBonus            Int      @default(0)
+  esopAnnual              Int      @default(0)
+  /// 0 means 12% of basic.
+  employeePfMonthly       Int      @default(0)
+  /// 0 means 12% of basic.
+  employerPfMonthly       Int      @default(0)
+  /// 0 means 15/26 of a month's basic, spread over the year.
+  gratuityMonthly         Int      @default(0)
+  professionalTaxMonthly  Int      @default(0)
+  sort                    Int      @default(0)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
 model StatusEvent {
   id                    String            @id @default(cuid())
   applicationId         String

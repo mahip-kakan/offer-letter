@@ -58,7 +58,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <main
           id="main"
           tabIndex={-1}
-          className="relative flex min-w-0 flex-1 flex-col rounded-b-panel border border-t-0 border-line-card bg-surface focus:outline-none"
+          className="relative flex min-w-0 flex-1 flex-col rounded-b-panel border border-t-0 border-line-card bg-surface [background-image:var(--paper-tooth)] [background-size:3px_3px] focus:outline-none"
         >
           {children}
         </main>

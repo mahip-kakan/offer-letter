@@ -50,9 +50,9 @@ describe("the list's URL (E9-1)", () => {
 
 describe("filters", () => {
   it("splits the statuses into in progress and closed", () => {
-    expect(statusesIn("active")).toEqual(["DRAFT", "SENT", "SCREENING", "INTERVIEW", "OFFER"]);
-    expect(statusesIn("closed")).toEqual(["ACCEPTED", "REJECTED", "DECLINED"]);
-    expect(statusesIn("all")).toHaveLength(8);
+    expect(statusesIn("active")).toEqual(["DRAFT", "SENT", "RECRUITER_CALL", "ASSESSMENT", "ASSIGNMENT", "SCREENING", "INTERVIEW", "HR_ROUND", "OFFER", "NEGOTIATION", "BGV"]);
+    expect(statusesIn("closed")).toEqual(["ACCEPTED", "JOINED", "REJECTED", "DECLINED"]);
+    expect(statusesIn("all")).toHaveLength(15);
   });
 });
 

@@ -47,10 +47,17 @@ describe("the board (E9-2)", () => {
     expect(screen.getAllByRole("region").map((region) => region.getAttribute("aria-labelledby"))).toEqual([
       "board-DRAFT",
       "board-SENT",
+      "board-RECRUITER_CALL",
+      "board-ASSESSMENT",
+      "board-ASSIGNMENT",
       "board-SCREENING",
       "board-INTERVIEW",
+      "board-HR_ROUND",
       "board-OFFER",
+      "board-NEGOTIATION",
+      "board-BGV",
       "board-ACCEPTED",
+      "board-JOINED",
       "board-REJECTED",
       "board-DECLINED",
     ]);
@@ -62,7 +69,7 @@ describe("the board (E9-2)", () => {
     open({ params: { ...params, filter: "closed" }, rows: [] });
     expect(screen.getByText("Nothing in this view yet.")).toBeInTheDocument();
     open({ params: { ...params, filter: "closed" }, rows: [row("q", { status: "DECLINED" })] });
-    expect(screen.getAllByRole("region")).toHaveLength(3);
+    expect(screen.getAllByRole("region")).toHaveLength(4);
   });
 
   it("puts the latest update first, with each card's details", () => {

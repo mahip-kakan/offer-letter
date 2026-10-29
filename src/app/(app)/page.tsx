@@ -10,6 +10,7 @@ import { loadSettings } from "@/lib/settings-data";
 import { userTimeZone } from "@/lib/time-zone";
 
 import { Dashboard } from "./dashboard";
+import { IndiaNotices } from "./india-notices";
 import { CalendarSkeleton, DashboardCalendar } from "./dashboard-calendar";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -38,6 +39,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/">) {
       range={range}
       quietDays={settings.quietDays}
       empty={figures.total === 0}
+      notices={<IndiaNotices />}
       calendar={
         <Suspense fallback={<CalendarSkeleton />}>
           <DashboardCalendar date={date} now={now} />

@@ -66,6 +66,13 @@ export const SECTIONS = [
     title: "Facts about me",
     hint: "What the AI should know about you that the rest of your profile doesn't say. It reads these when it writes your resumes and cover letters, and never copies them onto a resume as a list.",
   },
+  {
+    id: "naukri",
+    optional: true,
+    label: "Naukri",
+    title: "Naukri",
+    hint: "A headline, summary and key skills copied from your profile, ready to paste. Refreshing the profile on Naukri about once a week is what keeps you in recruiter search.",
+  },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]["id"];

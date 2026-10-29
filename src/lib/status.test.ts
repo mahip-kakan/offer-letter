@@ -23,14 +23,21 @@ function moves(start: StatusFields, ...statuses: S[]): StatusFields {
 }
 
 describe("status list", () => {
-  it("lists all eight statuses in order, with labels, colours, groups and toasts", () => {
+  it("lists every status in pipeline order, with the India stages among them", () => {
     expect(STATUSES.map((status) => status.label)).toEqual([
       "Draft",
       "Sent",
+      "Recruiter call",
+      "Assessment",
+      "Assignment",
       "Screening",
       "Interview",
+      "HR round",
       "Offer",
+      "Negotiation",
+      "Background check",
       "Accepted",
+      "Joined",
       "Rejected",
       "Declined",
     ]);
@@ -42,9 +49,15 @@ describe("status list", () => {
     expect(STATUSES.filter((status) => isInProgress(status.value)).map((status) => status.label)).toEqual([
       "Draft",
       "Sent",
+      "Recruiter call",
+      "Assessment",
+      "Assignment",
       "Screening",
       "Interview",
+      "HR round",
       "Offer",
+      "Negotiation",
+      "Background check",
     ]);
     expect(FUNNEL_STAGES).toEqual(["SENT", "SCREENING", "INTERVIEW", "OFFER", "ACCEPTED"]);
   });
@@ -70,6 +83,10 @@ describe("advance", () => {
       sentAt: now,
     });
     expect(moves(draft, S.OFFER)).toEqual({ status: S.OFFER, furthestStage: "OFFER", sentAt: now });
+    expect(moves(draft, S.RECRUITER_CALL).furthestStage).toBe("SCREENING");
+    expect(moves(draft, S.HR_ROUND).furthestStage).toBe("INTERVIEW");
+    expect(moves(draft, S.NEGOTIATION).furthestStage).toBe("OFFER");
+    expect(moves(draft, S.JOINED).furthestStage).toBe("ACCEPTED");
   });
 
   it("never lowers the furthest stage or changes the sent date when moving back", () => {

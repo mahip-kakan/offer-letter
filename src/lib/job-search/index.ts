@@ -8,6 +8,8 @@ import { JobSearchError, jobSearchError } from "./errors";
 import { adzuna } from "./adzuna";
 import { arbeitsagentur } from "./arbeitsagentur";
 import { jsearch } from "./jsearch";
+import { searchPlace } from "@/lib/india-cities";
+
 import { postingKey, type FoundPosting, type JobSource, type SearchPage, type SearchQuery } from "./search";
 import { sourceCovers } from "./sources";
 
@@ -48,11 +50,12 @@ export async function searchPostings<S extends JobSource>(
   context: RequestContext = {},
 ): Promise<SearchPage> {
   if (!sourceCovers(source, query.country)) throw jobSearchError("country", source, { country: query.country });
+  const asked = query.country === "in" ? { ...query, place: searchPlace(query.place) } : query;
   const adapter = adapterFor(source);
-  const key = `search:${source}:${JSON.stringify(query)}:${next ?? ""}`;
+  const key = `search:${source}:${JSON.stringify(asked)}:${next ?? ""}`;
   const hit = cached<SearchPage>(key);
   if (hit) return hit;
-  const page = await logged(() => adapter.search(query, credentials, next, context));
+  const page = await logged(() => adapter.search(asked, credentials, next, context));
   remember(key, page);
   return page;
 }

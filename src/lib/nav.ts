@@ -1,4 +1,4 @@
-import { Bot, BriefcaseBusiness, FileText, House, Inbox, Rocket, Search, Settings, UserRound, type LucideIcon } from "lucide-react";
+import { Bot, BriefcaseBusiness, FileText, House, Inbox, IndianRupee, Rocket, Search, Settings, UserRound, type LucideIcon } from "lucide-react";
 
 // The app's sections, shared by the sidebar and the page bar so they always agree.
 
@@ -29,6 +29,7 @@ export const NAV: { label?: string; items: NavItem[] }[] = [
       { href: "/jobs", label: "Find jobs", icon: Search },
       { href: "/startups", label: "Startups", icon: Rocket },
       { href: "/agent", label: "Agent", icon: Bot },
+      { href: "/offers", label: "Offers", icon: IndianRupee },
       {
         href: "/applications",
         label: "Applications",

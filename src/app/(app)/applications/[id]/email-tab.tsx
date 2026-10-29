@@ -10,6 +10,7 @@ import type { Unit } from "@/lib/application-data";
 import { emailParts, mailtoHref } from "@/lib/application-email";
 import { cn } from "@/lib/cn";
 import { copyText } from "@/lib/copy-text";
+import { whatsAppText } from "@/lib/whatsapp";
 
 import { SendWithGmail, type GmailSender } from "./send-with-gmail";
 import { aboutWords } from "./tabs";
@@ -36,6 +37,7 @@ export function EmailTab({
   onWrite,
   attachments,
   gmail,
+  whatsApp,
 }: {
   applicationId: string;
   /** The email's units; null until it's written. */
@@ -54,6 +56,8 @@ export function EmailTab({
   attachments: Attachments;
   /** Sending with Gmail (E15-2): who it sends from, and whether it went out that way before. */
   gmail?: { sender: GmailSender; sentBefore: boolean };
+  /** For the WhatsApp copy: the candidate, the role and the company. */
+  whatsApp?: { name: string; role: string; company: string };
 }) {
   if (!units) {
     return (
@@ -135,6 +139,12 @@ export function EmailTab({
         )}
         <Button variant={gmail?.sender.from ? "secondary" : "primary"} onClick={() => void copy(body, "message")}>
           Copy message
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => void copy(whatsAppText({ name: whatsApp?.name ?? "", role: whatsApp?.role ?? "", company: whatsApp?.company ?? "", body }), "WhatsApp message")}
+        >
+          Copy for WhatsApp
         </Button>
         {/* Mail apps can't take attachments from a link: the PDFs are attached by hand. */}
         <a href={mailtoHref({ to, subject, body })} className={buttonClassName("secondary", "md")}>

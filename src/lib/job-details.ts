@@ -31,10 +31,14 @@ export type JobDetails = {
   openToRelocate: boolean;
   /** Add a line with these to application emails, as Indian recruiters expect. */
   inApplicationEmails: boolean;
+  /** What it would cost to leave before the notice ends, as written. */
+  buyoutAmount: string;
+  relievingLetter: boolean;
+  experienceLetter: boolean;
 };
 
-const TEXT_KEYS = ["currentCtc", "expectedCtc", "noticePeriod", "lastWorkingDay", "preferredLocations"] as const;
-const FLAG_KEYS = ["noticeNegotiable", "openToRelocate", "inApplicationEmails"] as const;
+const TEXT_KEYS = ["currentCtc", "expectedCtc", "noticePeriod", "lastWorkingDay", "preferredLocations", "buyoutAmount"] as const;
+const FLAG_KEYS = ["noticeNegotiable", "openToRelocate", "inApplicationEmails", "relievingLetter", "experienceLetter"] as const;
 
 /** The ProfileField key for a detail: "job.currentCtc". */
 export const jobDetailKey = (field: keyof JobDetails) => `job.${field}`;
@@ -48,6 +52,9 @@ export const EMPTY_JOB_DETAILS: JobDetails = {
   preferredLocations: "",
   openToRelocate: false,
   inApplicationEmails: false,
+  buyoutAmount: "",
+  relievingLetter: false,
+  experienceLetter: false,
 };
 
 /** The details from ProfileField rows; other keys are ignored. */

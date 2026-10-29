@@ -32,6 +32,7 @@ const SUBTITLES: Record<Tab, string> = {
   conversation: "Answers to employers are drafted right in the conversation.",
   posting: "Switch to the resume, cover letter or email to make changes.",
   notes: "Switch to the resume, cover letter or email to make changes.",
+  hiring: "The referral and the joining date are on this tab. Switch to a document to ask for writing changes.",
 };
 
 /**

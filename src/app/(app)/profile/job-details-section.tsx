@@ -87,6 +87,24 @@ export function JobDetailsSection({
         checked={details.openToRelocate}
         onChange={(event) => set("openToRelocate", event.target.checked)}
       />
+      <Input
+        label="Notice buyout"
+        placeholder="2 months' salary"
+        value={details.buyoutAmount}
+        onChange={(event) => set("buyoutAmount", event.target.value)}
+        onBlur={flush}
+      />
+      <span />
+      <Checkbox
+        label="Relieving letter in hand"
+        checked={details.relievingLetter}
+        onChange={(event) => set("relievingLetter", event.target.checked)}
+      />
+      <Checkbox
+        label="Experience letter in hand"
+        checked={details.experienceLetter}
+        onChange={(event) => set("experienceLetter", event.target.checked)}
+      />
       <Checkbox
         className="col-span-2 pt-1"
         label={
