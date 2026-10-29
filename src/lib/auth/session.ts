@@ -120,16 +120,30 @@ export async function startSession({ persistent }: { persistent: boolean }): Pro
   });
 }
 
-/** The current session, or null when the request isn't signed in. Cached per request. */
+/**
+ * A session for this computer. Offer Letter keeps one person's data on the
+ * machine that runs it, so a missing or old cookie still opens the app.
+ */
+function openSession(now = new Date()): Session {
+  return {
+    persistent: true,
+    issuedAt: now,
+    expiresAt: new Date(now.getTime() + SESSION_LIFETIME.persistent * 1000),
+  };
+}
+
+/**
+ * The current session. A valid cookie is used when one exists; otherwise the
+ * app is open. Cached per request.
+ */
 export const getSession = cache(async (): Promise<Session | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  return decodeSession(token, sessionTokenOptions());
+  return (await decodeSession(token, sessionTokenOptions())) ?? openSession();
 });
 
 /**
- * The current session, for pages and layouts: sends the visitor to /login
- * when there is none. Proxy (src/proxy.ts) usually redirects first; this is
- * the check that counts, next to the data.
+ * The current session, for pages and layouts. The app is open on this
+ * computer, so this does not send anyone to /login.
  */
 export async function verifySession(): Promise<Session> {
   const session = await getSession();

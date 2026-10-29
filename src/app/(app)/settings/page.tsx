@@ -29,6 +29,9 @@ import { DataSection } from "./data-section";
 import { DocumentsSection } from "./documents-section";
 import { GoogleSection } from "./google-section";
 import { GoogleNotice } from "./google-notice";
+import { captureToken } from "@/lib/capture";
+
+import { CaptureCard } from "./capture-card";
 import { JobSearchSection } from "./job-search-section";
 import { AboutSection, type AboutFacts, type UsagePingView } from "./about-section";
 import { ConnectorSection } from "./connector-section";
@@ -51,7 +54,10 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <AiBehaviour initial={{ creativity: settings.creativity, strict: settings.strict, showDiff: settings.showDiff }} />
         </>
       ) : section === "jobs" ? (
-        <JobSearchSection initial={jobSearchView(await loadJobSearchConfig())} />
+        <>
+          <JobSearchSection initial={jobSearchView(await loadJobSearchConfig())} />
+          <CaptureCard token={await captureToken()} />
+        </>
       ) : section === "agent" ? (
         <AgentSection
           initial={{
@@ -206,7 +212,7 @@ async function aboutFacts(): Promise<AboutFacts> {
     { label: "Version", value: appVersion },
     { label: "Server", value: host },
     { label: "Database", value: `PostgreSQL · ${formatBytes(Number(database.size))}` },
-    { label: "Sign-in", value: "set via DOSSIER_PASSWORD" },
+    { label: "Sign-in", value: "Open on this computer" },
     { label: "AI", value: [providerOption(ai.provider).name, ai.model].filter(Boolean).join(" · ") },
     { label: "Applications", value: String(applications) },
   ];

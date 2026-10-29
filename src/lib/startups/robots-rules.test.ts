@@ -10,15 +10,15 @@ describe("robots.txt rules (RFC 9309, #222)", () => {
     "Allow: /private/careers",
     "",
     "User-agent: OtherBot",
-    "User-agent: Dossier",
+    "User-agent: OfferLetter",
     "Disallow: /team",
     "Disallow: /*.pdf$",
     "Disallow:",
     "Sitemap: https://acme.com/sitemap.xml",
   ].join("\n");
 
-  it("uses the groups naming Dossier, else the ones for everyone", () => {
-    const own = parseRobots(file, "dossier");
+  it("uses the groups naming Offer Letter, else the ones for everyone", () => {
+    const own = parseRobots(file, "offerletter");
     expect(robotsAllow(own, "/team")).toBe(false);
     expect(robotsAllow(own, "/private")).toBe(true);
     const others = parseRobots(file, "somebot");
@@ -33,7 +33,7 @@ describe("robots.txt rules (RFC 9309, #222)", () => {
   });
 
   it("reads * and $ in paths", () => {
-    const rules = parseRobots(file, "dossier");
+    const rules = parseRobots(file, "offerletter");
     expect(robotsAllow(rules, "/files/deck.pdf")).toBe(false);
     expect(robotsAllow(rules, "/files/deck.pdf?x=1")).toBe(true);
   });

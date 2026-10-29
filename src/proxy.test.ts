@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import { encodeSession, passwordFingerprint, SESSION_COOKIE } from "@/lib/auth/session";
 import { deriveKey } from "@/lib/keys";
-import { messages } from "@/lib/messages";
 import { PRINT_TOKEN_HEADER, signPrintToken } from "@/lib/pdf/print-token";
 
 import { config, proxy } from "./proxy";
@@ -80,14 +79,15 @@ describe("proxy", () => {
     expect(response.headers.get("content-security-policy")).toBeNull();
   });
 
-  it("sends signed-out visitors to /login, remembering where they were going", async () => {
-    expect(getRedirectUrl(await proxy(request("/applications/abc?tab=letter")))).toBe(
-      "http://localhost:3000/login?next=%2Fapplications%2Fabc%3Ftab%3Dletter",
-    );
-    expect(getRedirectUrl(await proxy(request("/")))).toBe("http://localhost:3000/login");
+  it("opens pages without a session cookie", async () => {
+    for (const path of ["/", "/applications/abc?tab=letter", "/profile"]) {
+      const response = await proxy(request(path));
+      expect(response.headers.get("x-middleware-next"), path).toBe("1");
+      expect(getRedirectUrl(response), path).toBeNull();
+    }
   });
 
-  it("treats an expired, forged or pre-password-change cookie as signed out", async () => {
+  it("opens pages with an expired, forged or old cookie", async () => {
     const expired = await encodeSession(
       { persistent: false },
       { key, fingerprint, now: new Date(Date.now() - 25 * 60 * 60 * 1000) },
@@ -95,7 +95,9 @@ describe("proxy", () => {
     const forged = await encodeSession({ persistent: true }, { key: deriveKey("session", "b".repeat(32)), fingerprint });
     const oldPassword = await encodeSession({ persistent: true }, { key, fingerprint: "stale-fingerprint" });
     for (const cookie of [expired, forged, oldPassword, "garbage"]) {
-      expect(getRedirectUrl(await proxy(request("/profile", { cookie })))).toContain("/login");
+      const response = await proxy(request("/profile", { cookie }));
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+      expect(getRedirectUrl(response)).toBeNull();
     }
   });
 
@@ -104,15 +106,15 @@ describe("proxy", () => {
       const response = await proxy(request(path));
       expect(response.headers.get("x-middleware-next"), path).toBe("1");
     }
-    // The consent page is an ordinary page: sign in first.
-    expect(getRedirectUrl(await proxy(request("/oauth/authorize?client_id=x")))).toBe("http://localhost:3000/login?next=%2Foauth%2Fauthorize%3Fclient_id%3Dx");
-    expect((await proxy(request("/api/mcpx"))).status).toBe(401);
+    const consent = await proxy(request("/oauth/authorize?client_id=x"));
+    expect(consent.headers.get("x-middleware-next")).toBe("1");
+    expect((await proxy(request("/api/mcpx"))).headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("answers API requests with 401 JSON instead of a redirect", async () => {
+  it("lets API requests through without a session cookie", async () => {
     const response = await proxy(request("/api/pdf/1"));
-    expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: messages.signedOut });
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.status).not.toBe(401);
   });
 
   it("leaves Server Action calls to the action's own session check", async () => {
@@ -126,15 +128,16 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it("refuses print tokens for another page, forged ones and tokens outside /print", async () => {
+  it("opens print pages without a password, including with a token for another page", async () => {
     const other = await signPrintToken("/print/resume/1");
     const forged = await signPrintToken("/print/base", "b".repeat(32));
     for (const token of [other, forged, "garbage"]) {
       const response = await proxy(request("/print/base", { headers: { [PRINT_TOKEN_HEADER]: token } }));
-      expect(getRedirectUrl(response)).toContain("/login");
+      expect(response.headers.get("x-middleware-next")).toBe("1");
+      expect(getRedirectUrl(response)).toBeNull();
     }
     const profileToken = await signPrintToken("/profile");
     const response = await proxy(request("/profile", { headers: { [PRINT_TOKEN_HEADER]: profileToken } }));
-    expect(getRedirectUrl(response)).toContain("/login");
+    expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 });

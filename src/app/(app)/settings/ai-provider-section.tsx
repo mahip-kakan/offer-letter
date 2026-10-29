@@ -132,7 +132,7 @@ export function AiProviderSection({ initial }: { initial: AiSettingsView }) {
   return (
     <>
       <SettingsSectionIntro title="AI provider">
-        This is what reads job postings and writes your drafts. A local model keeps everything on your machine.
+        Start with Ollama, which is free and stays on this computer. Install it, run ollama pull qwen2.5:7b, then pick Local model. The address is http://localhost:11434. No API key. A hosted key is only needed if you choose one of the cards below.
       </SettingsSectionIntro>
 
       <RadioGroup.Root

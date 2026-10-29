@@ -17,27 +17,31 @@ const within = (pathname: string, base: string) =>
 export const NAV: { label?: string; items: NavItem[] }[] = [
   { items: [{ href: "/", label: "Dashboard", icon: House, isActive: (pathname) => pathname === "/" }] },
   {
-    label: "You",
-    items: [
-      { href: "/profile", label: "Profile", icon: UserRound },
-      { href: "/resume", label: "Base resume", icon: FileText },
-    ],
-  },
-  {
-    label: "Job search",
+    label: "Search",
     items: [
       { href: "/jobs", label: "Find jobs", icon: Search },
       { href: "/startups", label: "Startups", icon: Rocket },
       { href: "/agent", label: "Agent", icon: Bot },
+    ],
+  },
+  {
+    label: "Applications",
+    items: [
       { href: "/offers", label: "Offers", icon: IndianRupee },
       {
         href: "/applications",
         label: "Applications",
         icon: BriefcaseBusiness,
-        // A new application becomes one, so the flow belongs to Applications.
         isActive: (pathname) => within(pathname, "/applications") || within(pathname, "/new"),
       },
       { href: "/inbox", label: "Inbox", icon: Inbox },
+    ],
+  },
+  {
+    label: "Profile",
+    items: [
+      { href: "/profile", label: "Profile", icon: UserRound },
+      { href: "/resume", label: "Base resume", icon: FileText },
     ],
   },
   { items: [{ href: "/settings", label: "Settings", icon: Settings }] },

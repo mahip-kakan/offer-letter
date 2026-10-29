@@ -1,8 +1,7 @@
-import { LogOut, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
-import { signOut } from "@/lib/auth/actions";
 import type { Release } from "@/lib/releases";
 import type { ColorScheme } from "@/lib/ui-preferences";
 
@@ -48,7 +47,7 @@ export function Sidebar({
         <>
           <BrandMark />
           <div className="flex min-w-0 flex-col group-data-collapsed/sidebar:hidden">
-            <span className="font-serif text-2xl leading-none font-medium tracking-[-0.01em]">Dossier</span>
+            <span className="text-[15px] leading-none font-semibold tracking-tight">Offer Letter</span>
             <span className="truncate text-xs text-muted">Your job search, on your server</span>
           </div>
         </>
@@ -90,18 +89,8 @@ export function Sidebar({
         </span>
         <span className="flex min-w-0 flex-1 flex-col group-data-collapsed/sidebar:hidden">
           <span className="truncate text-xs font-medium">{userName}</span>
-          <span className="truncate text-[11px] text-muted">Self-hosted · v{currentVersion}</span>
+          <span className="truncate text-[11px] text-muted">On this computer · v{currentVersion}</span>
         </span>
-        <form action={signOut}>
-          <button
-            type="submit"
-            aria-label="Sign out"
-            title="Sign out"
-            className="grid size-[26px] place-items-center rounded-control text-muted hover:bg-hover hover:text-ink"
-          >
-            <LogOut size={15} aria-hidden="true" />
-          </button>
-        </form>
       </div>
     </SidebarFrame>
   );

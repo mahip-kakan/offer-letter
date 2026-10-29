@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Save to Offer Letter</title>
+    <style>
+      body { font: 14px/1.4 ui-sans-serif, system-ui, sans-serif; margin: 0; width: 320px; color: #1f2328; }
+      main { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+      label { font-size: 12px; font-weight: 600; }
+      input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #8c959f; border-radius: 6px; padding: 8px; font: inherit; }
+      button { border: 0; border-radius: 6px; background: #1f2328; color: #fff; font: inherit; font-weight: 600; padding: 8px 12px; cursor: pointer; }
+      p { margin: 0; color: #59636e; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <label for="token">Token from Settings → Job search</label>
+      <input id="token" autocomplete="off" />
+      <label for="text">Posting</label>
+      <textarea id="text" rows="8" placeholder="Select the posting on the page, or paste it here."></textarea>
+      <button id="save" type="button">Save to Offer Letter</button>
+      <p id="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

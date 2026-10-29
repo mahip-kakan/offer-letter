@@ -46,22 +46,22 @@ describe("the session cookie (E3-1)", () => {
     expect(jar.set).toHaveBeenCalledWith(SESSION_COOKIE, expect.any(String), expect.objectContaining({ secure: true, maxAge: SESSION_LIFETIME.persistent }));
   });
 
-  it("reads no session from a missing or forged cookie", async () => {
-    expect(await getSession()).toBeNull();
+  it("opens the app when the cookie is missing or forged", async () => {
+    expect(await getSession()).toMatchObject({ persistent: true });
     jar.values.set(SESSION_COOKIE, "not-a-token");
-    expect(await getSession()).toBeNull();
+    expect(await getSession()).toMatchObject({ persistent: true });
   });
 
-  it("sends visitors without a session to the sign-in page", async () => {
-    await expect(verifySession()).rejects.toThrow("redirect /login");
+  it("opens the app without sending anyone to the sign-in page", async () => {
+    await expect(verifySession()).resolves.toMatchObject({ persistent: true });
     await startSession({ persistent: false });
     await expect(verifySession()).resolves.toMatchObject({ persistent: false });
   });
 
-  it("ends the session by deleting the cookie", async () => {
+  it("ends a remembered cookie, and the app stays open", async () => {
     await startSession({ persistent: false });
     await endSession();
     expect(jar.remove).toHaveBeenCalledWith(SESSION_COOKIE);
-    expect(await getSession()).toBeNull();
+    expect(await getSession()).toMatchObject({ persistent: true });
   });
 });

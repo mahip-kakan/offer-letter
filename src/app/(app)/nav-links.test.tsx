@@ -26,14 +26,14 @@ describe("NavLinks", () => {
     render(<NavLinks />);
     expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual([
       "Dashboard",
-      "Profile",
-      "Base resume",
       "Find jobs",
       "Startups",
       "Agent",
       "Offers",
       "Applications",
       "Inbox",
+      "Profile",
+      "Base resume",
       "Settings",
     ]);
   });
