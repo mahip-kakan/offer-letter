@@ -10,7 +10,7 @@ out=${1:-_site}
 rm -rf "$out"
 mkdir -p "$out/images" "$out/fonts"
 cp site/index.html site/style.css site/main.js site/og.png "$out/"
-cp .github/images/*.png .github/images/demo.gif "$out/images/"
+cp .github/images/*.png "$out/images/"
 cp src/app/icon.svg src/app/favicon.ico src/app/apple-icon.png "$out/"
 cp src/fonts/newsreader/*.woff2 src/fonts/geist/*.woff2 src/fonts/jetbrains-mono/*.woff2 "$out/fonts/"
 for font in newsreader geist jetbrains-mono; do

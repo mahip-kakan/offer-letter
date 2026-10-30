@@ -24,9 +24,9 @@ Offer Letter is a job search application by Mahip Kakan. It runs for one person,
 
 ## Demo
 
-![Offer Letter in use: the dashboard, dragging a card on the board, a new application from a pasted posting, refining the tailored resume in the chat, the cover letter, and switching resume themes](.github/images/demo.gif)
+![The Offer Letter dashboard: Jane's funnel, the week-by-week chart, and the calendar](.github/images/dashboard.png)
 
-<sub>Recorded with the demo data (Jane Doe is made up) and a stand-in AI server that answers at once, played at 1.2× speed. With a real model, reading a posting and writing the documents takes from a few seconds to a few minutes.</sub>
+<sub>The sample profile. Jane Doe is made up.</sub>
 
 ## Features
 
